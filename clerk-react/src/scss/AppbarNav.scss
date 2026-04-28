@@ -1,0 +1,63 @@
+/* src/scss/AppbarNav.scss */
+
+.appbar {
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Toolbar spacing */
+.appbar__toolbar {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Left section */
+.appbar__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.appbar__logoBtn {
+  color: #1a73e8;
+}
+
+/* Title */
+.appbar__title {
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: #202124;
+}
+
+/* Workspace pill */
+.appbar__pill {
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  color: #5f6368;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #f8f9fa;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+/* Hide on xs */
+@media (max-width: 599.95px) {
+  .appbar__pill {
+    display: none;
+  }
+}
+
+/* Logout button */
+.appbar__logout {
+  text-transform: none;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 6px 18px;
+  color: #fff;
+  background: #1a73e8;
+}
+
+.appbar__logout:hover {
+  background: #1669c1;
+}

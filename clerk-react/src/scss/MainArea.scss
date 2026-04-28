@@ -1,0 +1,329 @@
+/* --- tokens (optional but recommended) --- */
+:root {
+  --bg: #f8f9fa;
+  --card: #fff;
+  --text: #202124;
+  --muted: #5f6368;
+  --border: #e6e7e9;
+  --brand: #8cb107;
+  --brand-01: #fd0d21;
+  --brand-08: rgba(26, 115, 232, 0.08);
+  --brand-25: rgba(26, 115, 232, 0.25);
+  --brand-60: rgba(26, 115, 232, 0.6);
+}
+
+/* src/scss/MainArea.scss */
+
+.main {
+  flex-grow: 1;
+  overflow-y: auto;
+  position: relative;
+  background: var(--bg);
+  padding: 24px;
+}
+
+@media (max-width: 899.95px) {
+  .main {
+    padding: 16px;
+  }
+}
+
+/* Header */
+.main__header {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.main__title {
+  color: var(--text) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.2px !important;
+}
+
+.main__count {
+  color: var(--muted) !important;
+}
+
+/* Grid */
+.main__grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+/* Skeleton card */
+.main__skeletonCard {
+  border-radius: 12px !important;
+  border-color: var(--border) !important;
+  background: var(--card) !important;
+}
+
+/* Empty state */
+.main__empty {
+  text-align: center;
+  padding: 48px 0;
+  border: 1px dashed rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  background: var(--card);
+}
+
+.main__emptyAvatar {
+  width: 72px !important;
+  height: 72px !important;
+  margin: 0 auto 16px !important;
+  background: var(--brand-08) !important;
+  color: var(--brand) !important;
+  border: 1px solid var(--brand-25) !important;
+}
+
+.main__emptyTitle {
+  color: var(--text) !important;
+}
+
+.main__emptySub {
+  margin-top: 8px !important;
+  color: var(--muted) !important;
+}
+
+/* File card */
+.fileCard {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+
+  background: var(--card) !important;
+  border-radius: 12px !important;
+  border-color: var(--border) !important;
+
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02) !important;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease, transform 0.12s ease,
+    background-color 0.12s ease !important;
+}
+
+.fileCard:hover {
+  border-color: var(--brand-60) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08) !important;
+  transform: translateY(-2px) !important;
+}
+
+.fileCard:focus-within {
+  outline: 2px solid rgba(26, 115, 232, 0.35);
+  outline-offset: 0;
+}
+
+/* top strip */
+.fileCard__strip {
+  height: 3px;
+  width: 100%;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  //background: rgba(26, 115, 232, 0.2);
+}
+
+/* content */
+.fileCard__content {
+  display: flex !important;
+  gap: 12px !important;
+  align-items: flex-start !important;
+  padding: 18px !important;
+}
+
+// .fileCard__typeIcon {
+//   width: 40px;
+//   height: 40px;
+//   padding: 10px;
+//   border-radius: 10px;
+//   background: rgba(26,115,232,0.08);
+//   border: 1px solid rgba(26,115,232,0.25);
+//   color: #1a73e8;
+//   flex-shrink: 0;
+// }
+
+// .fileCard__typeIcon--pdf {
+//   background: rgba(234, 67, 53, 0.10);
+//   border-color: rgba(234, 67, 53, 0.25);
+//   color: #ea4335;
+// }
+
+// .fileCard__typeIcon--word {
+//   background: rgba(66, 133, 244, 0.10);
+//   border-color: rgba(66, 133, 244, 0.25);
+//   color: #4285f4;
+// }
+
+
+.fileCard__meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.fileCard__name {
+  color: var(--text) !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+}
+
+/* ✅ remove sx color from Typography captions */
+.fileCard__caption {
+  color: var(--muted) !important;
+}
+
+/* ✅ time row now supports right-aligned status */
+.fileCard__timeRow {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* pushes status to the right end */
+.fileCard__timeRow .fileCard__status {
+  margin-left: auto;
+}
+
+/* ✅ status styles */
+.fileCard__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* loading state */
+.fileCard__status--loading .fileCard__statusText {
+  color: var(--muted);
+}
+
+.fileCard__statusSpinner {
+  color: var(--brand) !important;
+}
+
+/* READY badge (Chip) */
+.fileCard__statusChip {
+  height: 22px !important;
+  border-radius: 999px !important;
+  border-color: rgba(26, 115, 232, 0.35) !important;
+  background: rgba(26, 115, 232, 0.04) !important;
+  color: var(--brand) !important;
+}
+
+.fileCard__statusChip .MuiChip-label {
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+}
+
+.fileCard__statusChip .MuiChip-icon {
+  margin-left: 8px !important;
+  font-size: 16px !important;
+  color: var(--brand) !important;
+}
+
+/* divider */
+.fileCard__divider {
+  border-color: var(--border) !important;
+}
+
+/* actions */
+.fileCard__actions {
+  padding: 6px 10px !important;
+  justify-content: space-between !important;
+  background: var(--card) !important;
+  border-bottom-left-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
+}
+
+.fileCard__iconBtn {
+  color: var(--text) !important;
+  border-radius: 10px !important;
+}
+
+.fileCard__iconBtn:hover {
+  background: var(--brand-08) !important;
+}
+
+.fileCard__deleteBtn {
+  border-radius: 10px !important;
+}
+
+/* Delete dialog */
+.main__dialogTitle {
+  color: var(--text) !important;
+}
+
+.main__dialogText {
+  color: var(--muted) !important;
+}
+
+.main__dialogBtn {
+  text-transform: none !important;
+}
+
+/* CHAT DIALOG */
+.chatPaper {
+  width: 920px !important;
+  height: 640px !important;
+  display: flex !important;
+  flex-direction: column !important;
+
+  border-radius: 12px !important;
+  border: 1px solid var(--border) !important;
+  background: var(--card) !important;
+}
+
+.chatTitle {
+  cursor: move;
+  padding-right: 40px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+
+  color: var(--text) !important;
+  border-bottom: 1px solid var(--border) !important;
+
+  border-top-left-radius: 12px !important;
+  border-top-right-radius: 12px !important;
+
+  flex-shrink: 0 !important;
+}
+
+.chatClose {
+  margin-left: auto !important;
+  color: var(--muted) !important;
+}
+
+.chatContent {
+  background: var(--card) !important;
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  border-top: none !important;
+}
+
+.chatScroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.chatActions {
+  padding: 12px 16px !important;
+  border-top: 1px solid var(--border) !important;
+  flex-shrink: 0 !important;
+}
+
+.chatSend {
+  text-transform: none !important;
+  background: var(--brand) !important;
+  border-radius: 999px !important;
+  padding-left: 18px !important;
+  padding-right: 18px !important;
+}
+
+.chatSend:hover {
+  background: #1669c1 !important;
+}
