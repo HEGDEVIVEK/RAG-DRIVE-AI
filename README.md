@@ -29,8 +29,6 @@ RAG fixes this by retrieving the most relevant chunks from our documents and pro
 • Pre-filtered similarity search (fileId + userId) → clean, secure multi-tenant retrieval<br>
 • Cloud-first design with scalable storage + automated ingestion pipeline<br>
 <br>
-Below is the cloud architecture diagram I designed for this system (upload + async ingestion + RAG query)
-<br>
-<img width="1382" height="400" alt="Upload and Ingestion" src="https://github.com/user-attachments/assets/d278443f-418e-4336-978d-cb6ad9182e06" />
-<br>
-<img width="703" height="383" alt="Chat with file" src="https://github.com/user-attachments/assets/b5b73e76-7212-4781-ad18-01e102951706" />
+Below is the cloud architecture diagram I designed for this system
+<img width="1680" height="1125" alt="RAG-DRIVE-AI" src="https://github.com/user-attachments/assets/1514f013-c9c3-4976-8b17-59d27704d544" />
+
