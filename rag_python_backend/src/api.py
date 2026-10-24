@@ -4,15 +4,19 @@ from dotenv import load_dotenv
 
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, Depends, File, UploadFile
+from fastapi import FastAPI, Depends, File, UploadFile, HTTPException
 from uuid import uuid4
 from datetime import datetime, timezone
+from pydantic import BaseModel, Field
+from bson import ObjectId
 
 from src.auth import get_current_user
 from src.mongodb import mongo_client, mongo_db
 from src.awsS3 import s3, S3_BUCKET_NAME
 from src.awsSQS import sqs, SQS_QUEUE_URL
-from src.openai import openai_client
+
+from src.generation import generate_answer
+
 
 load_dotenv()
 
@@ -24,7 +28,6 @@ async def lifespan(app: FastAPI):
         mongo_client.close()
         s3.close()
         sqs.close()
-        openai_client.close()
 
         print("Service clients closed")
 
@@ -41,6 +44,9 @@ app.add_middleware(
 
 
 
+class ChatRequest(BaseModel):
+    file_id: str = Field(min_length=1)
+    query: str = Field(min_length=1, max_length=5000)
 
 
 
@@ -79,15 +85,6 @@ def upload_file(
 
     s3_url = f"https://{S3_BUCKET_NAME}.s3.{os.getenv("AWS_REGION")}.amazonaws.com/{s3_key}"
 
-    # presigned_url = s3.generate_presigned_url(
-    #     "get_object",
-    #     Params={
-    #         "Bucket" : S3_BUCKET_NAME,
-    #         "Key" : s3_key
-    #     },
-    #     ExpiresIn = 3600
-    # )
-
     file_document = {
         "owner" : user_id,
         "filename" : file.filename,
@@ -104,10 +101,7 @@ def upload_file(
         QueueUrl=SQS_QUEUE_URL,
         MessageBody=json.dumps({
             "fileId" : str(response.inserted_id),
-            "owner" : user_id,
-            "s3Key" : s3_key,
-            "mimetype" : file.content_type,
-            "filename" : file.filename
+            "s3Key" : s3_key
         })
     )
 
@@ -120,7 +114,7 @@ def upload_file(
     }
 
 
-@app.get("files")
+@app.get("/files")
 def list_files(user_id : str = Depends(get_current_user)):
     documents = mongo_db["files"].find({"owner" : user_id}).sort("uploadedAt", -1)
 
@@ -143,3 +137,28 @@ def list_files(user_id : str = Depends(get_current_user)):
         "file_list" : file_list
     }
 
+
+@app.post("/chats/ask")
+def ask_question(
+    request: ChatRequest,
+    user_id: str = "123"
+):
+
+    if not ObjectId.is_valid(request.file_id):
+        raise HTTPException(status_code=400, detail= "Invalid file ID")
+
+    file_document = mongo_db["files"].find_one({"_id" : ObjectId(request.file_id), "owner" : user_id})
+    if file_document is None:
+        raise HTTPException(status_code=400, detail= "File not found")
+
+    try:
+        result = generate_answer(
+            question=request.query,
+            file_id=request.file_id,
+            owner=user_id
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail= "Answer generation is failed. Please try again")
+
+    return result
