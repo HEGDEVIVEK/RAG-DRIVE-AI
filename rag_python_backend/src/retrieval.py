@@ -1,3 +1,4 @@
+from docx.opc.oxml import pr_namespace
 from langchain_mongodb import MongoDBAtlasVectorSearch
 from src.embeddings import embedding_model
 from src.mongodb import mongo_db, mongo_client
@@ -18,14 +19,18 @@ vector_store = MongoDBAtlasVectorSearch(
 )
 
 
-def retrieve_relevant_chunks(question, file_id, owner):
+def retrieve_relevant_chunks(question, fileId, owner):
+    print("Retrieving relevant chunks...")
+    print("Query:", question)
+    print("File ID:", fileId)
+    print("Owner:", owner)
     results = vector_store.similarity_search_with_score(
         query=question,
         k=3,
         oversampling_factor=20,
         pre_filter={
             "metadata.owner":{"$eq": owner},
-            "metadata.fileId":{"$eq": file_id},
+            "metadata.fileId":{"$eq": fileId},
         }
     )
 
@@ -37,5 +42,6 @@ def retrieve_relevant_chunks(question, file_id, owner):
             "metadata": document.metadata["metadata"],
             "score": score,
         })
+    pprint(matches)
 
     return matches

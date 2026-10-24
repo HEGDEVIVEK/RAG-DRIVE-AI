@@ -14,7 +14,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import CircularProgress from "@mui/material/CircularProgress";
 
-import "../scss/ChatWindow.scss"; // ✅ separate file
+import "../scss/ChatWindow.scss"; //
 
 const ChatWindow = ({
   selectedFile,
@@ -25,8 +25,6 @@ const ChatWindow = ({
   closeChat,
   sendMessage,
   sending,
-  savingChatLoading,
-  chatListLoading
 }) => {
   const chatScrollRef = useRef(null);
 
@@ -56,16 +54,6 @@ const ChatWindow = ({
         <Typography variant="subtitle1" noWrap>
           {selectedFile ? selectedFile.filename : ""}
         </Typography>
-       
-       {(savingChatLoading || chatListLoading) && (
-         <Box className="chatSavingLoadingText">
-          <CircularProgress size={16} thickness={5} className="chatSavingLoading" />
-            <Typography variant="caption" className="chatStatusText" noWrap>
-            {savingChatLoading ? "Saving chat…" : "Loading chat…"}
-            </Typography>
-          </Box>
-        )}
-
 
         <IconButton
           aria-label="close"

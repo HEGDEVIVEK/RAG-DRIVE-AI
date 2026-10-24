@@ -40,6 +40,7 @@ const SidebarContent = ({ setRefresh }) => {
   const handleClickNew = (event) => setAnchorEl(event.currentTarget);
   const handleCloseMenu = () => setAnchorEl(null);
 
+
   const handleUploadFile = () => {
     fileInputRef.current?.click();
     handleCloseMenu();
@@ -54,6 +55,8 @@ const SidebarContent = ({ setRefresh }) => {
     setSelectedFiles((prev) => prev.filter((_, i) => i !== idx));
     setUploadingFiles((prev) => prev.filter((_, i) => i !== idx));
   };
+
+
 
   const handleFileUpload = async () => {
     if (selectedFiles.length === 0) return;
@@ -74,21 +77,24 @@ const SidebarContent = ({ setRefresh }) => {
         const fd = new FormData();
         fd.append("files", file);
 
-        const res = await axios.post("http://localhost:5000/upload", fd, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-          onUploadProgress: (progressEvent) => {
-            const percent = progressEvent.total
-              ? Math.round((progressEvent.loaded * 100) / progressEvent.total)
-              : 0;
+        const res = await axios.post("http://localhost:8000/files/upload",
+          fd,
+          {
+            headers:
+            {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+            onUploadProgress: (progressEvent) => {
+              const percent = progressEvent.total
+                ? Math.round((progressEvent.loaded * 100) / progressEvent.total)
+                : 0;
 
-            setUploadingFiles((prev) =>
-              prev.map((p, idx) => (idx === i ? { ...p, progress: percent } : p))
-            );
-          },
-        });
+              setUploadingFiles((prev) =>
+                prev.map((p, idx) => (idx === i ? { ...p, progress: percent } : p))
+              );
+            },
+          });
 
         setUploadingFiles((prev) =>
           prev.map((p, idx) => (idx === i ? { ...p, status: "success", progress: 100 } : p))
@@ -106,29 +112,24 @@ const SidebarContent = ({ setRefresh }) => {
     }
   };
 
+
+
   const displayName = user?.fullName || user?.primaryEmailAddress?.emailAddress || "Guest";
   const firstLetter = (displayName?.trim()?.charAt(0) || "G").toUpperCase();
 
   return (
     <Paper elevation={0} className="sidebar">
-      
+
       {/* Header */}
       <Stack direction="row" spacing={1.5} alignItems="center" className="sidebar__header">
-
         <Avatar className="sidebar__avatar" aria-label="User avatar">
           {firstLetter}
         </Avatar>
-
         <Box sx={{ minWidth: 0 }}>
           <Typography variant="subtitle1" noWrap className="sidebar__name">
             {displayName}
           </Typography>
-
-          <Typography variant="caption" className="sidebar__sub">
-            Quick actions
-          </Typography>
         </Box>
-
       </Stack>
 
       <Divider className="sidebar__divider" />
@@ -197,7 +198,7 @@ const SidebarContent = ({ setRefresh }) => {
       {/* Uploads list */}
       <Box className="sidebar__uploads">
         <Typography variant="subtitle2" className="sidebar__uploadsTitle">
-          Uploads
+          Selected files
         </Typography>
 
         {selectedFiles.length === 0 ? (

@@ -41,9 +41,9 @@ Rules:
 
 chain = prompt | llm_model | StrOutputParser()
 
-def generate_answer(question, file_id, owner):
+def generate_answer(question, fileId, owner):
     # 1. Retrieve relevant chunks
-    chunks = retrieve_relevant_chunks(question, file_id, owner)
+    chunks = retrieve_relevant_chunks(question, fileId, owner)
 
     # 2. Convert the entire retrieved list into a JSON string
     context = json.dumps(chunks, ensure_ascii=False, indent=2)

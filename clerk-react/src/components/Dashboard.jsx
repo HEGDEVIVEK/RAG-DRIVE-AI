@@ -16,14 +16,14 @@ export default function Dashboard() {
       {/* <CssBaseline /> */}
 
       {/* Top Navigation */}
-      {/* <Box className="navWrap">
+      <Box className="navWrap">
         <Paper elevation={1} className="navCard">
           <AppbarNav />
         </Paper>
-      </Box> */}
+      </Box>
 
       {/* Body: Sidebar + Main */}
-      {/* <Box className="body">
+      <Box className="body">
         <Paper elevation={2} className="sidebarCard">
           <SidebarContent setRefresh={setRefresh} />
         </Paper>
@@ -31,8 +31,9 @@ export default function Dashboard() {
         <Paper elevation={2} className="mainCard">
           <MainArea refresh={refresh} />
         </Paper>
-      </Box> */}
-      <AuthTest />
+      </Box>
+
+      {/* <AuthTest /> */}
     </Box>
   );
 }
