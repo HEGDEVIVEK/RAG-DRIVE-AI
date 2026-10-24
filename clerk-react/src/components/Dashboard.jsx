@@ -3,7 +3,8 @@ import { Box, CssBaseline, Paper } from "@mui/material";
 import AppbarNav from "./AppbarNav";
 import SidebarContent from "./SidebarContent";
 import MainArea from "./MainArea";
-import  "../scss/Dashboard.scss";
+import AuthTest from "./AuthTest";
+import "../scss/Dashboard.scss";
 
 
 
@@ -12,17 +13,17 @@ export default function Dashboard() {
 
   return (
     <Box className="page">
-      <CssBaseline />
+      {/* <CssBaseline /> */}
 
       {/* Top Navigation */}
-      <Box className="navWrap">
+      {/* <Box className="navWrap">
         <Paper elevation={1} className="navCard">
           <AppbarNav />
         </Paper>
-      </Box>
+      </Box> */}
 
       {/* Body: Sidebar + Main */}
-      <Box className="body">
+      {/* <Box className="body">
         <Paper elevation={2} className="sidebarCard">
           <SidebarContent setRefresh={setRefresh} />
         </Paper>
@@ -30,7 +31,8 @@ export default function Dashboard() {
         <Paper elevation={2} className="mainCard">
           <MainArea refresh={refresh} />
         </Paper>
-      </Box>
+      </Box> */}
+      <AuthTest />
     </Box>
   );
 }
