@@ -49,9 +49,6 @@ const MainArea = ({ refresh }) => {
   const [sending, setSending] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
-  const [savingChatLoading, setSavingChat] = useState(false);
-  const [chatListLoading, setChatListLoading] = useState(false);
-  const [chatID, setChatId] = useState(null);
 
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [fileToDelete, setFileToDelete] = useState(null);
@@ -73,28 +70,18 @@ const MainArea = ({ refresh }) => {
     const fetchFiles = async () => {
       try {
         const token = await getToken();
-        const res = await axios.get("http://localhost:5000/files", {
-          headers: { Authorization: `Bearer ${token}` },
+
+        const res = await axios.get("http://localhost:8000/files", {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
         });
-        setFiles(res.data || []);
-
-        const hasActive = res.data.some((f) =>
-          ["QUEUED", "PROCESSING"].includes(f.status),
-        );
-
-        if (hasActive && !timer) {
-          timer = setInterval(fetchFiles, 4000);
-        }
-
-        // stop polling if done
-        if (!hasActive && timer) {
-          clearInterval(timer);
-          timer = null;
-        }
+        setFiles(res.data.file_list || []);
 
       } catch (error) {
         console.error("Error fetching files", error);
-       setLoading(false);
+        setLoading(false);
       } finally {
         setLoading(false);
       }
@@ -107,14 +94,19 @@ const MainArea = ({ refresh }) => {
     };
   }, [refresh]);
 
+
+
   const handleDelete = async (id) => {
     setConfirmDeleteOpen(false);
     try {
       const token = await getToken();
-      await axios.delete(`http://localhost:5000/files/${id}/deletefile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setFiles((prev) => prev.filter((f) => f._id !== id));
+      await axios.delete(`http://localhost:8000/${id}/deletefile`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+      }
+      );
+      setFiles((prev) => prev.filter((f) => f.id !== id));
       setSnackbar({ open: true, msg: "File deleted", severity: "success" });
     } catch (err) {
       console.error("Error deleting file:", err);
@@ -127,113 +119,76 @@ const MainArea = ({ refresh }) => {
     setConfirmDeleteOpen(true);
   };
 
+
+
   const openChat = async (file) => {
     setSelectedFile(file);
     setChatOpen(true);
-    const fileId = file?._id;
+    const fileId = file?.id;
 
     try {
-    setChatListLoading(true);
-    const token = await getToken();
+      const token = await getToken();
 
-    const res  = await axios.get(`http://localhost:5000/files/${fileId}/getchats`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+      const res = await axios.get(`http://localhost:8000/${fileId}/getchats`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+      });
 
-    console.log("Fetched chat history:", res.data.data._id)
-    setChatId(res.data?.data?._id || null)
-    setMessages(res.data?.data?.messages || []);
-  } catch (e) {
-    console.error(e);
-    setSnackbar({ open: true, msg: "Failed to load chat history", severity: "error" });
-  } finally {
-    setChatListLoading(false);
-  }
+      setMessages(res.data?.messages || []);
+    } catch (e) {
+      console.error(e);
+      setSnackbar({ open: true, msg: "Failed to load chat history", severity: "error" });
+    }
   };
 
   const closeChat = async () => {
-  const fileId = selectedFile?._id;
-  const chatMessages = [...messages];
-  const savedChatId = chatID;
-
-  // if nothing to save, just close
-  if (!fileId || chatMessages.length === 0) {
     setChatOpen(false);
     setSelectedFile(null);
     setMessages([]);
     setInput("");
-    return;
   }
-
-  try {
-    setSavingChat(true);
-    const token = await getToken();
-
-    if(savedChatId){
-      console.log("Updating existing chat:", savedChatId)
-      await axios.put(
-        `http://localhost:5000/files/${savedChatId}/updatechat`,
-        { messages: chatMessages },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setSnackbar({ open: true, msg: "Chat Updated", severity: "success" });
-    }else{
-      console.log("Saving new chat for file:", fileId)
-      const res = await axios.post(
-      `http://localhost:5000/files/${fileId}/savechat`,
-      {messages: chatMessages},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    setSnackbar({ open: true, msg: "Chat saved", severity: "success" });  
-  } 
-
-  setChatOpen(false);
-  setSelectedFile(null);
-  setMessages([]);
-  setInput("");
-  setChatId(null);
-}
-catch (err) {
-    console.error("Failed to save chat:", err?.response?.data || err);
-    setSnackbar({ open: true, msg: "Failed to save chat", severity: "error" });
-  } finally {
-    setSavingChat(false);
-  }
-}
-  
-
 
   const sendMessage = async () => {
+
     const question = input.trim();
     if (!question || !selectedFile) return;
 
-    const userMsg = { role: "user", text: question, ts: new Date().toISOString() };
+    const userMsg = { role: "user", text: question, timestamp: new Date().toISOString(), source: [] };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setSending(true);
 
     try {
       const token = await getToken();
-      const { data } = await axios.post(
-        `http://localhost:5000/files/${selectedFile._id}/chat`,
-        { question },
-        { headers: { Authorization: `Bearer ${token}` } }
+      const result = await axios.post(`http://localhost:8000/chats/ask`,
+        {
+          query: question,
+          fileId: selectedFile.id
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
       );
 
-      const answerText = data?.answer ?? data?.response ?? data?.text ?? "No answer returned.";
-      const assistantMsg = { role: "assistant", text: answerText, ts: new Date().toISOString() };
-      setMessages((prev) => [...prev, assistantMsg]);
+      console.log("Sent chat message:", result.data);
+
+      const answerMsg = result.data.message;
+      setMessages((prev) => [...prev, answerMsg]);
     } catch (err) {
       console.error(err);
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", text: "Error: failed to get a response.", ts: new Date().toISOString() },
+        { role: "assistant", text: "Error: failed to get a response.", timestamp: new Date().toISOString() },
       ]);
     } finally {
       setSending(false);
     }
   };
+
+
 
   const summarizePdf = async (file) => {
     if (!file) return;
@@ -296,7 +251,7 @@ catch (err) {
         ) : (
           <Box className="main__grid">
             {files.map((file) => (
-              <Card key={file._id} variant="outlined" className="fileCard">
+              <Card key={file.id} variant="outlined" className="fileCard">
                 <Box className="fileCard__strip" />
 
                 <CardContent className="fileCard__content">
@@ -322,7 +277,7 @@ catch (err) {
                         {dayjs(file.uploadedAt).format("MMM D, YYYY")}
                       </Typography>
 
-                      {["QUEUED", "PROCESSING"].includes(
+                      {["UPLOADED", "PROCESSING"].includes(
                         (file.status || "").toUpperCase(),
                       ) ? (
                         <Box className="fileCard__status fileCard__status--loading">
@@ -339,7 +294,7 @@ catch (err) {
                             embedding…
                           </Typography>
                         </Box>
-                      ) : (file.status || "").toUpperCase() === "READY" ? (
+                      ) : (file.status || "").toUpperCase() === "COMPLETED" ? (
                         <Chip
                           size="small"
                           icon={<CheckCircleIcon />}
@@ -391,10 +346,10 @@ catch (err) {
                       <IconButton
                         size="small"
                         onClick={() => summarizePdf(file)}
-                        disabled={summarizing === file._id}
+                        disabled={summarizing === file.id}
                         className="fileCard__iconBtn"
                       >
-                        {summarizing === file._id ? (
+                        {summarizing === file.id ? (
                           <CircularProgress size={18} />
                         ) : (
                           <SummarizeIcon fontSize="small" />
@@ -407,7 +362,7 @@ catch (err) {
                     <IconButton
                       size="small"
                       color="error"
-                      onClick={() => confirmDelete(file._id)}
+                      onClick={() => confirmDelete(file.id)}
                       className="fileCard__deleteBtn"
                     >
                       <DeleteOutlineIcon fontSize="small" />
@@ -449,7 +404,7 @@ catch (err) {
         </DialogActions>
       </Dialog>
 
-      <ChatWindow 
+      <ChatWindow
         selectedFile={selectedFile}
         chatOpen={chatOpen}
         messages={messages}
@@ -458,8 +413,6 @@ catch (err) {
         closeChat={closeChat}
         sendMessage={sendMessage}
         sending={sending}
-        savingChatLoading={savingChatLoading}
-        chatListLoading={chatListLoading}
       />
 
       <Snackbar
