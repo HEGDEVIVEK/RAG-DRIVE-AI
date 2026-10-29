@@ -1,0 +1,27 @@
+name: rag-drive-ai
+
+services:
+  frontend:
+    image: rag-frontend:local
+    ports:
+      - "5173:80"
+    restart: unless-stopped
+
+  backend:
+    image: rag-backend:local
+    env_file:
+      - ./rag_python_backend/.env
+    environment:
+      CLIENT_URL: http://localhost:5173
+      PYTHONUNBUFFERED: "1"
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  worker:
+    image: rag-worker:local
+    env_file:
+      - ./rag_python_backend/.env
+    environment:
+      PYTHONUNBUFFERED: "1"
+    restart: unless-stopped
