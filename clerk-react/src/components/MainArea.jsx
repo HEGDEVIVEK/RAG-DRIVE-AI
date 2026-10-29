@@ -71,7 +71,7 @@ const MainArea = ({ refresh }) => {
       try {
         const token = await getToken();
 
-        const res = await axios.get("http://localhost:8000/files", {
+        const res = await axios.get("/api/files", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`
@@ -100,7 +100,7 @@ const MainArea = ({ refresh }) => {
     setConfirmDeleteOpen(false);
     try {
       const token = await getToken();
-      await axios.delete(`http://localhost:8000/${id}/deletefile`, {
+      await axios.delete(`/api/${id}/deletefile`, {
         headers: {
           Authorization: `Bearer ${token}`
         },
@@ -129,7 +129,7 @@ const MainArea = ({ refresh }) => {
     try {
       const token = await getToken();
 
-      const res = await axios.get(`http://localhost:8000/${fileId}/getchats`, {
+      const res = await axios.get(`/api/${fileId}/getchats`, {
         headers: {
           Authorization: `Bearer ${token}`
         },
@@ -161,7 +161,7 @@ const MainArea = ({ refresh }) => {
 
     try {
       const token = await getToken();
-      const result = await axios.post(`http://localhost:8000/chats/ask`,
+      const result = await axios.post(`/api/chats/ask`,
         {
           query: question,
           fileId: selectedFile.id

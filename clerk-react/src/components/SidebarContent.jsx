@@ -77,7 +77,7 @@ const SidebarContent = ({ setRefresh }) => {
         const fd = new FormData();
         fd.append("files", file);
 
-        const res = await axios.post("http://localhost:8000/files/upload",
+        const res = await axios.post("/api/files/upload",
           fd,
           {
             headers:

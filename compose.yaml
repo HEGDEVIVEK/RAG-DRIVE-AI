@@ -2,13 +2,15 @@ name: rag-drive-ai
 
 services:
   frontend:
-    image: rag-frontend:local
+    image: vivekhegde78/rag-frontend:v1
     ports:
       - "5173:80"
+    depends_on:
+      - backend
     restart: unless-stopped
 
   backend:
-    image: rag-backend:local
+    image: vivekhegde78/rag-backend:v1
     env_file:
       - ./rag_python_backend/.env
     environment:
@@ -19,7 +21,7 @@ services:
     restart: unless-stopped
 
   worker:
-    image: rag-worker:local
+    image: vivekhegde78/rag-worker:v1
     env_file:
       - ./rag_python_backend/.env
     environment:
